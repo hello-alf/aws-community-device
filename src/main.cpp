@@ -6,6 +6,7 @@
 #include "wifi_connection.h"
 #include "aws_broker.h"
 #include "measure.h"
+#include "led_rgb.h"
 
 WiFiClientSecure net = WiFiClientSecure();
 PubSubClient client(net);
@@ -16,9 +17,6 @@ const int buttonPin = 18; // Pin conectado al botón
 int buttonState = 0;
 int lastButtonState = HIGH; 
 
-float humidity = 0;
-float temperature = 0;
-
 void setup() {
   Serial.begin(115200);
   pinMode(LED_PIN, OUTPUT);
@@ -27,6 +25,7 @@ void setup() {
   connectWiFi();
   connectAWS();
   configDHT();
+  configRGBLeds();
   
 }
 
@@ -64,6 +63,8 @@ void loop() {
   // lastButtonState = buttonState;
 
   // delay(100); // 1000 ms apagado
+
+  leds();
 
   char buffer[512]; 
   measureDHT(buffer, sizeof(buffer));
