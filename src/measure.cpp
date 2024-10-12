@@ -24,8 +24,14 @@ void measureDHT(char* buffer, size_t bufferSize) {
   Serial.println(" °C");
 
   StaticJsonDocument<200> doc;
-  doc["temperature"] = temperature;
-  doc["humidity"] = humidity;
+  
+  char tempBuffer[8];
+  char humBuffer[8];
+  dtostrf(temperature, 4, 1, tempBuffer);
+  dtostrf(humidity, 4, 1, humBuffer);
+
+  doc["temperature"] = tempBuffer;
+  doc["humidity"] = humBuffer;
   doc["device_id"] = THINGNAME;
 
   serializeJson(doc, buffer, bufferSize);
