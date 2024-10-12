@@ -11,6 +11,17 @@ void configRGBLeds(){
   pinMode(pinBlue, OUTPUT);
 }
 
+void updateRGBLed(int red, int green, int blue) {
+  
+  red = constrain(red, 0, 255);
+  green = constrain(green, 0, 255);
+  blue = constrain(blue, 0, 255);
+
+  digitalWrite(pinRed, red);
+  digitalWrite(pinGreen, green);
+  digitalWrite(pinBlue, blue);
+}
+
 void leds(){
   digitalWrite(pinRed, HIGH);
   digitalWrite(pinGreen, LOW);

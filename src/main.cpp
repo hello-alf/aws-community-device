@@ -11,16 +11,18 @@
 WiFiClientSecure net = WiFiClientSecure();
 PubSubClient client(net);
 
-#define LED_PIN                2  // Pin conectado al LED
-const int buttonPin = 18; // Pin conectado al botón
+#define LED_PIN       2  // Pin conectado al LED
 
 int buttonState = 0;
-int lastButtonState = HIGH; 
+int lastButtonState = HIGH;
+
+
+unsigned long previousMillis = 0;  // Almacena el último tiempo que se envió información
+const long interval = 10000;       // Intervalo de tiempo (10 segundos)
 
 void setup() {
   Serial.begin(115200);
   pinMode(LED_PIN, OUTPUT);
-  pinMode(buttonPin, INPUT_PULLUP);
 
   connectWiFi();
   connectAWS();
@@ -30,14 +32,6 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  // for (int i = 0; i < 5; i++) {
-  //   Serial.println("Cambiando el estado del LED");
-  //   digitalWrite(LED_PIN, HIGH);
-  //   delay(1000); // 1000 ms encendido
-  //   digitalWrite(LED_PIN, LOW);
-  //   delay(1000); // 1000 ms apagado
-  // }
 
   if(!client.connected()){
     reconnectAWS();
@@ -45,33 +39,20 @@ void loop() {
 
   client.loop();
 
-  digitalWrite(LED_PIN, LOW);
+  // Obtén el tiempo actual
+  unsigned long currentMillis = millis();
 
-  // buttonState = digitalRead(buttonPin);
-  
-  // if (buttonState == LOW && lastButtonState == HIGH) {
-  //   // El pulsador acaba de ser presionado
-  //   Serial.println("¡Botón presionado!");
-  //   // Aquí puedes ejecutar la acción que desees
-  // }
+  // Si han pasado más de 10 segundos, realiza las acciones
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;  // Actualiza el tiempo de la última ejecución
 
-  // if (buttonState == HIGH && lastButtonState == LOW) {
-  //   Serial.println("¡Botón soltado!");
-  // }
+    digitalWrite(LED_PIN, LOW);
 
-  // // Guardar el estado actual como el último estado, para la siguiente iteración
-  // lastButtonState = buttonState;
+    char buffer[512]; 
+    measureDHT(buffer, sizeof(buffer));
 
-  // delay(100); // 1000 ms apagado
-
-  leds();
-
-  char buffer[512]; 
-  measureDHT(buffer, sizeof(buffer));
-
-  digitalWrite(LED_PIN, HIGH);
-  publishData(buffer);
-
-  delay(10000);
+    digitalWrite(LED_PIN, HIGH);
+    publishData(buffer);
+  }
 
 }
